@@ -63,7 +63,12 @@ $env:DB_PASSWORD = (Get-Content .env | Where-Object { $_ -match '^DB_PASSWORD=' 
 If you use IntelliJ IDEA, you can instead add `DB_USERNAME` and `DB_PASSWORD`
 to the Run/Debug configuration's environment variables.
 
-### 4. Start the application
+### 4. Create "voice_uploads" directory
+
+Create a directory named `voice_uploads` in the project root. This is where
+the application will store voice samples for speaker recognition.
+
+### 5. Start the application
 
 Run the application from the project root:
 
