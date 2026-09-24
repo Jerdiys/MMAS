@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MMAS - System Performance</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/index.css}">
+    <style>
+        .pagination {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .page-link:hover {
+            color: var(--primary-hover);
+        }
+
+        .dashboard-container {
+            max-width: 900px;
+            width: 95%;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-val {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-top: 0.5rem;
+            color: var(--success);
+        }
+
+        .table-panel {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            overflow: hidden;
+            padding: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th,
+        td {
+            padding: 0.8rem 1.2rem;
+            border-bottom: 1px solid var(--border-glass);
+        }
+
+        th {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+        }
+
+        td {
+            font-size: 0.95rem;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+        }
+
+        .badge-error {
+            background: rgba(239, 68, 104, 0.15);
+            color: var(--error);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="glass-card dashboard-container">
+        <a href="/" class="home-button"> Home </a>
+        <h1>Authentication Analytics</h1>
+        <p class="subtitle">Real-time tracking of biometric verification latency, accuracy, and telemetry logs.</p>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="subtitle" style="margin:0;">Average speed</div>
+                <div class="stat-val"
+                    th:text="${avgSpeed != null ? #numbers.formatDecimal(avgSpeed, 1, 0) + ' ms' : 'N/A'}">1240 ms</div>
+            </div>
+            <div class="stat-card">
+                <div class="subtitle" style="margin:0;">System accuracy</div>
+                <div class="stat-val"
+                    th:text="${accuracy != null ? #numbers.formatDecimal(accuracy, 1, 1) + '%' : 'N/A'}">98.5%</div>
+            </div>
+            <div class="stat-card">
+                <div class="subtitle" style="margin:0;">Total verification logs</div>
+                <div class="stat-val" style="color:var(--primary)" th:text="${totalLogs}">85</div>
+            </div>
+        </div>
+
+        <div class="table-panel">
+            <h3 style="margin-top:0.5rem; margin-bottom:1rem; padding-left:0.5rem;">Recent Telemetry Audit Logs</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>User</th>
+                        <th>Status</th>
+                        <th>Latency</th>
+                        <th>Failure Cause / Signal Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="log : ${logs}">
+                        <td th:text="${#temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm:ss')}">2026-06-19 18:24:00
+                        </td>
+                        <td th:text="${log.username}">jdoe</td>
+                        <td>
+                            <span class="status-badge" th:classappend="${log.success ? 'badge-success' : 'badge-error'}"
+                                th:text="${log.success ? 'SUCCESS' : 'FAILED'}">SUCCESS</span>
+                        </td>
+                        <td th:text="${log.durationMs + ' ms'}">1100 ms</td>
+                        <td th:text="${log.failureReason != null ? log.failureReason : 'All factors matched.'}">All
+                            factors matched.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <!-- Pagination Controls -->
+            <div class="pagination">
+                <a th:if="${hasPrevious}" th:href="@{/metrics(page=${currentPage - 1}, size=${size})}"
+                    class="page-link">Previous</a>
+                <span th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages}">Page 1 of 10</span>
+                <a th:if="${hasNext}" th:href="@{/metrics(page=${currentPage + 1}, size=${size})}"
+                    class="page-link">Next</a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

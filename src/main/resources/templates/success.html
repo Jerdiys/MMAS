@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MMAS - Success</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/index.css}">
+    <style>
+        .glowing-success {
+            box-shadow: 0 0 40px rgba(16, 185, 129, 0.25);
+            text-align: center;
+        }
+        .icon-circle {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid var(--success);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 1.5rem;
+            color: var(--success);
+            font-size: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="glass-card glowing-success">
+        <div class="icon-circle">✓</div>
+        <h1 style="background: linear-gradient(135deg, #34d399, #059669); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Authentication Verified</h1>
+        <p class="subtitle">Multi-modal biometric handshake successfully verified.</p>
+        
+        <div th:if="${similarity != null}" class="voice-panel" style="margin-bottom: 2rem;">
+            <span class="indicator-text" style="display:block; margin:0;">Voice Match Cosine Similarity</span>
+            <strong style="color:var(--success); font-size:1.5rem; display:block; margin-top:0.3rem;" th:text="${similarity}">0.892</strong>
+        </div>
+
+        <a href="/metrics" class="btn-primary" style="display:inline-block; text-decoration:none; width:80%;">View Performance Metrics</a>
+    </div>
+</body>
+</html>

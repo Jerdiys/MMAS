@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MMAS - Login Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/index.css}">
+</head>
+
+<body>
+    <div class="glass-card">
+        <a href="/" class="home-button"> Home </a>
+        <h1>Identity Portal</h1>
+        <p class="subtitle">Multi-modal verification required to establish session credentials.</p>
+
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" class="input-field" placeholder="e.g. jdoe">
+        </div>
+
+        <button id="btnLogin" class="btn-primary" onclick="startLogin()">Verify Multi-Modal Auth</button>
+
+        <div id="voiceSection" class="voice-panel" style="display:none;">
+            <p style="font-size:0.95rem; margin-top:0;">Speak your validation phrase:</p>
+            <strong style="color:var(--primary); font-size:1.1rem; display:block; margin-bottom:1rem;">"My voice is my
+                secure key passport."</strong>
+            <div id="micButton" class="record-indicator" onclick="toggleRecording()">🎤</div>
+            <div id="statusLabel" class="indicator-text">Hold micro to verify voice match</div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/wav-recorder.js}"></script>
+    <script>
+        let assertionCredentialJson = null;
+        let isRecording = false;
+        let usernameVal = "";
+
+        async function startLogin() {
+            usernameVal = document.getElementById('username').value.trim();
+            if (!usernameVal) {
+                alert("Please enter a username.");
+                return;
+            }
+
+            try {
+                // 1. Get assertion request challenge
+                const response = await fetch(`/api/auth/login/options?username=${encodeURIComponent(usernameVal)}`, { method: 'POST' });
+                const requestJson = await response.json();
+
+                if (requestJson.error) {
+                    alert("Error: " + requestJson.error);
+                    return;
+                }
+
+                // 2. Decode options and prompt navigator
+                const decodedRequest = PublicKeyCredential.parseRequestOptionsFromJSON(requestJson.publicKey || requestJson);
+                const assertion = await navigator.credentials.get({ publicKey: decodedRequest });
+
+                assertionCredentialJson = JSON.stringify(assertion.toJSON());
+
+                // 3. Prompt voice step
+                document.getElementById('btnLogin').style.display = 'none';
+                document.getElementById('voiceSection').style.display = 'block';
+            } catch (err) {
+                alert("WebAuthn Verification Failed: " + err.message);
+            }
+        }
+
+        async function toggleRecording() {
+            const micBtn = document.getElementById('micButton');
+            const status = document.getElementById('statusLabel');
+
+            if (!isRecording) {
+                await startWavRecording();
+                isRecording = true;
+                micBtn.classList.add('recording');
+                status.innerText = "Recording... Speak phrase.";
+            } else {
+                status.innerText = "Analyzing factors...";
+                micBtn.classList.remove('recording');
+                isRecording = false;
+
+                const voiceBlob = await stopWavRecording();
+
+                const formData = new FormData();
+                formData.append('username', usernameVal);
+                formData.append('credentialJson', assertionCredentialJson);
+                formData.append('voice', voiceBlob, 'login.wav');
+
+                const uploadRes = await fetch('/api/auth/login/finish', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (uploadRes.status === 200) {
+                    const result = await uploadRes.json();
+                    window.location.href = `/success?similarity=${result.similarity.toFixed(3)}`;
+                } else {
+                    const result = await uploadRes.json();
+                    window.location.href = `/failure?reason=${encodeURIComponent(result.error || "Factors verification mismatched")}`;
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

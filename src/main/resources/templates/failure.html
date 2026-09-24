@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MMAS - Verification Mismatch</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/index.css}">
+    <style>
+        .glowing-error {
+            box-shadow: 0 0 40px rgba(239, 68, 68, 0.2);
+            text-align: center;
+        }
+        .icon-circle {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid var(--error);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 1.5rem;
+            color: var(--error);
+            font-size: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="glass-card glowing-error">
+        <div class="icon-circle">✕</div>
+        <h1 style="background: linear-gradient(135deg, #f87171, #dc2626); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Access Denied</h1>
+        <p class="subtitle">Mismatched factor checks. Authentication failed.</p>
+        
+        <div th:if="${reason != null}" class="voice-panel" style="margin-bottom: 2rem; border-color: rgba(239, 68, 68, 0.2);">
+            <span class="indicator-text" style="display:block; margin:0; color:var(--error);">Telemetry Error Signal</span>
+            <strong style="color:var(--text-main); font-size:1.05rem; display:block; margin-top:0.5rem;" th:text="${reason}">Voice signature verification failed.</strong>
+        </div>
+
+        <a href="/login" class="btn-primary" style="display:inline-block; text-decoration:none; width:80%;">Retry Portal Verification</a>
+    </div>
+</body>
+</html>

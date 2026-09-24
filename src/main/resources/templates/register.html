@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MMAS - Registration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/index.css}">
+</head>
+
+<body>
+    <div class="glass-card">
+        <a href="/" class="home-button"> Home </a>
+        <h1>Registration</h1>
+        <p class="subtitle">Complete WebAuthn credentials and voice signature enrollment.</p>
+
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" class="input-field" placeholder="e.g. jdoe">
+        </div>
+
+        <button id="btnEnroll" class="btn-primary" onclick="startEnrollment()">Enroll Fingerprint & Voice</button>
+
+        <div id="voiceSection" class="voice-panel" style="display:none;">
+            <p style="font-size:0.95rem; margin-top:0;">Vocal Enrollment: Hold record and say:</p>
+            <strong style="color:var(--primary); font-size:1.1rem; display:block; margin-bottom:1rem;">"My voice is my
+                secure key passport."</strong>
+            <div id="micButton" class="record-indicator" onclick="toggleRecording()">🎤</div>
+            <div id="statusLabel" class="indicator-text">Click the mic to speak</div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/wav-recorder.js}"></script>
+    <script>
+        let registeredCredentialJson = null;
+        let isRecording = false;
+        let usernameVal = "";
+
+        async function startEnrollment() {
+            usernameVal = document.getElementById('username').value.trim();
+            if (!usernameVal) {
+                alert("Please enter a username.");
+                return;
+            }
+
+            try {
+                // 1. Fetch challenge/options
+                const response = await fetch(`/api/auth/register/options?username=${encodeURIComponent(usernameVal)}`, { method: 'POST' });
+                const optionsJson = await response.json();
+
+                if (optionsJson.error) {
+                    alert("Error: " + optionsJson.error);
+                    return;
+                }
+
+                // 2. Decode options and trigger WebAuthn ceremony
+                const decodedOptions = PublicKeyCredential.parseCreationOptionsFromJSON(optionsJson.publicKey || optionsJson);
+                const credential = await navigator.credentials.create({ publicKey: decodedOptions });
+
+                // Keep the JSON string result
+                registeredCredentialJson = JSON.stringify(credential.toJSON());
+
+                // 3. Show vocal recording step
+                document.getElementById('btnEnroll').style.display = 'none';
+                document.getElementById('voiceSection').style.display = 'block';
+            } catch (err) {
+                alert("WebAuthn Setup Failed: " + err.message);
+            }
+        }
+
+        async function toggleRecording() {
+            const micBtn = document.getElementById('micButton');
+            const status = document.getElementById('statusLabel');
+
+            if (!isRecording) {
+                await startWavRecording();
+                isRecording = true;
+                micBtn.classList.add('recording');
+                status.innerText = "Recording... Say the phrase clearly.";
+            } else {
+                status.innerText = "Processing audio...";
+                micBtn.classList.remove('recording');
+                isRecording = false;
+
+                const voiceBlob = await stopWavRecording();
+
+                // Submit everything
+                status.innerText = "Uploading credentials & voice...";
+                const formData = new FormData();
+                formData.append('username', usernameVal);
+                formData.append('credentialJson', registeredCredentialJson);
+                formData.append('voice', voiceBlob, 'enrollment.wav');
+
+                const uploadRes = await fetch('/api/auth/register/finish', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await uploadRes.json();
+                if (result.success) {
+                    window.location.href = '/success';
+                } else {
+                    alert("Enrollment Failed: " + result.error);
+                    status.innerText = "Failed. Try recording again.";
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

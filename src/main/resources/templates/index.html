@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MMAS - Multi-Modal Authentication</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/index.css}">
+    <style>
+        .landing-container {
+            max-width: 800px;
+            width: 95%;
+            text-align: center;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin: 2.5rem 0;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        .feature-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .logo-badge {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="glass-card landing-container">
+        <div class="logo-badge">Next-Gen Biometrics</div>
+        <h1>Multi-Modal Authentication System</h1>
+        <p class="subtitle" style="max-width: 600px; margin-left: auto; margin-right: auto;">
+            A secure identity platform combining <strong>Fingerprint (WebAuthn)</strong> credentials and
+            <strong>VOSK Speaker Recognition</strong> (voice match telemetry) for multi-factor authorization.
+        </p>
+
+        <div class="features-grid">
+            <a href="/register" class="feature-card">
+                <div class="feature-icon">👤</div>
+                <div class="feature-title">Enroll Biometrics</div>
+                <div class="feature-desc">Register your user profile, link a hardware key/fingerprint, and save your
+                    reference vocal signature.</div>
+            </a>
+            <a href="/login" class="feature-card">
+                <div class="feature-icon">🔑</div>
+                <div class="feature-title">Secure Portal</div>
+                <div class="feature-desc">Authenticate by signing a WebAuthn assertion challenge and verifying real-time
+                    vocal similarity.</div>
+            </a>
+            <a href="/metrics" class="feature-card">
+                <div class="feature-icon">📊</div>
+                <div class="feature-title">Telemetry Analytics</div>
+                <div class="feature-desc">Examine system accuracy rates, average recognition speed latency, and recent
+                    access audits.</div>
+            </a>
+        </div>
+
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">
+            MMAS Client-Server Handshake • Designed for High-Assurance Environments
+        </p>
+    </div>
+</body>
+
+</html>
