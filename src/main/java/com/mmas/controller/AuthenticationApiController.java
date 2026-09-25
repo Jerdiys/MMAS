@@ -204,7 +204,7 @@ public class AuthenticationApiController {
 
             double similarity = voskSpeakerService.calculateSimilarity(currentVector,
                     referenceSample.getSpeakerVector());
-            double threshold = 0.80; // Cosine similarity threshold for verification
+            double threshold = 0.8000; // Cosine similarity threshold for verification
 
             if (similarity < threshold) {
                 throw new SecurityException(String.format(
@@ -212,7 +212,8 @@ public class AuthenticationApiController {
             }
 
             // Log successful attempt
-            logAuth(username, true, System.currentTimeMillis() - startTime, null);
+            String similarityStr = String.format("%.4f", similarity);
+            logAuth(username, true, System.currentTimeMillis() - startTime, "Authentication successful. Similarity: " + similarityStr);
 
             // Log user in custom session context
             session.setAttribute("user", username);

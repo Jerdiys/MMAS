@@ -163,6 +163,10 @@ h1 {
     font-size: 1rem;
     font-weight: 600;
     transition: color 0.2s;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-glass);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
 }
 
 .home-button:hover {

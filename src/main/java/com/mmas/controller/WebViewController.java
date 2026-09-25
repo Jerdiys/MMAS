@@ -53,7 +53,7 @@ public class WebViewController {
         long successCount = authLogRepository.countSuccessfulAttempts();
         long totalCount = authLogRepository.countTotalAttempts();
 
-        double accuracy = totalCount > 0 ? ((double) successCount / totalCount) * 100.0 : 100.0;
+        double accuracy = totalCount > 0 ? ((double) successCount / totalCount) * 100.0 : 0.0;
         Page<AuthLog> logs = authLogService.getAuthLogs(page, size);
 
         model.addAttribute("avgSpeed", avgSpeed != null ? avgSpeed : 0.0);

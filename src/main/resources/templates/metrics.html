@@ -57,7 +57,7 @@
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid var(--border-glass);
             border-radius: 16px;
-            overflow: hidden;
+            overflow-x: auto;
             padding: 1rem;
         }
 
@@ -148,8 +148,7 @@
                                 th:text="${log.success ? 'SUCCESS' : 'FAILED'}">SUCCESS</span>
                         </td>
                         <td th:text="${log.durationMs + ' ms'}">1100 ms</td>
-                        <td th:text="${log.failureReason != null ? log.failureReason : 'All factors matched.'}">All
-                            factors matched.</td>
+                        <td th:text="${log.failureReason}">Reasons</td>
                     </tr>
                 </tbody>
             </table>
